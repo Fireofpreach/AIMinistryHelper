@@ -505,8 +505,6 @@ export class MemStorage implements IStorage {
   async deleteResource(id: number): Promise<boolean> {
     return this.resources.delete(id);
   }
-}
-
 
   // Initialize pre-connected theological resources
   initializePreConnectedResources() {
