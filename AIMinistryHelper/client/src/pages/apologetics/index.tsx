@@ -1,12 +1,37 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Apologetics() {
@@ -15,7 +40,8 @@ export default function Apologetics() {
   const [query, setQuery] = useState("");
   const [showAddResourceDialog, setShowAddResourceDialog] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  
+  const [apiResponse, setApiResponse] = useState<string | null>(null);
+
   // Sample apologetics categories
   const categories = [
     { id: "existence", name: "Existence of God", count: 24 },
@@ -27,8 +53,8 @@ export default function Apologetics() {
     { id: "religions", name: "World Religions", count: 19 },
     { id: "trinity", name: "The Trinity", count: 12 },
   ];
-  
-  // Sample resources
+
+  // Sample resources (kept as-is)
   const resources = [
     {
       id: 1,
@@ -36,13 +62,14 @@ export default function Apologetics() {
       category: "Resurrection of Jesus",
       author: "William Lane Craig",
       type: "Article",
-      summary: "A scholarly examination of historical evidence for the resurrection of Jesus Christ, addressing common objections and alternative theories.",
+      summary:
+        "A scholarly examination of historical evidence for the resurrection of Jesus Christ, addressing common objections and alternative theories.",
       keyPoints: [
         "Empty tomb is attested by multiple independent sources",
         "Post-resurrection appearances were witnessed by groups, not just individuals",
         "Early Christian proclamation began in Jerusalem, where the crucifixion occurred",
-        "Transformation of the disciples into bold proclaimers despite threat of death"
-      ]
+        "Transformation of the disciples into bold proclaimers despite threat of death",
+      ],
     },
     {
       id: 2,
@@ -50,13 +77,14 @@ export default function Apologetics() {
       category: "Problem of Evil/Suffering",
       author: "C.S. Lewis",
       type: "Book Summary",
-      summary: "Lewis examines the question of why God allows suffering and pain in a world He created, offering a philosophical and theological framework for understanding suffering.",
+      summary:
+        "Lewis examines the question of why God allows suffering and pain in a world He created, offering a philosophical and theological framework for understanding suffering.",
       keyPoints: [
         "Human free will necessitates the possibility of evil choices",
         "Pain serves as a warning system in the physical world",
         "Suffering can lead to spiritual growth and dependence on God",
-        "God's ultimate goodness is compatible with temporary suffering"
-      ]
+        "God's ultimate goodness is compatible with temporary suffering",
+      ],
     },
     {
       id: 3,
@@ -64,13 +92,14 @@ export default function Apologetics() {
       category: "Existence of God",
       author: "William Lane Craig",
       type: "Argument",
-      summary: "A philosophical argument for God's existence based on the beginning of the universe and the principle of causality.",
+      summary:
+        "A philosophical argument for God's existence based on the beginning of the universe and the principle of causality.",
       keyPoints: [
         "Whatever begins to exist has a cause",
         "The universe began to exist (supported by Big Bang cosmology)",
         "Therefore, the universe has a cause",
-        "This cause must be timeless, spaceless, immaterial, powerful, and personal"
-      ]
+        "This cause must be timeless, spaceless, immaterial, powerful, and personal",
+      ],
     },
     {
       id: 4,
@@ -78,13 +107,14 @@ export default function Apologetics() {
       category: "Biblical Reliability",
       author: "Craig Blomberg",
       type: "Book Summary",
-      summary: "An examination of the historical reliability of the Gospel accounts, addressing common criticisms and demonstrating their trustworthiness.",
+      summary:
+        "An examination of the historical reliability of the Gospel accounts, addressing common criticisms and demonstrating their trustworthiness.",
       keyPoints: [
         "Early dating of gospel manuscripts (within lifetime of eyewitnesses)",
         "Archaeological confirmations of names, places, and customs",
         "Internal consistency of accounts despite different perspectives",
-        "Inclusion of embarrassing details unlikely in fictional accounts"
-      ]
+        "Inclusion of embarrassing details unlikely in fictional accounts",
+      ],
     },
     {
       id: 5,
@@ -92,56 +122,48 @@ export default function Apologetics() {
       category: "Objective Morality",
       author: "C.S. Lewis",
       type: "Argument",
-      summary: "An argument for God's existence based on the reality of objective moral values and duties in the world.",
+      summary:
+        "An argument for God's existence based on the reality of objective moral values and duties in the world.",
       keyPoints: [
         "If objective moral values exist, God exists",
         "Objective moral values do exist (moral relativism is self-defeating)",
         "Therefore, God exists",
-        "Moral law requires a moral lawgiver"
-      ]
+        "Moral law requires a moral lawgiver",
+      ],
     },
   ];
-  
-  // Sample real-time responses
-  const realTimeResponses = {
-    existence: {
-      objection: "If God exists, why isn't there more evidence?",
-      response: "This objection assumes that God, if He exists, would provide the kind and amount of evidence the objector demands. However, this assumption fails for several reasons:\n\n1. **Divine Hiddenness Has Purpose**: God may have morally sufficient reasons for not making His existence overwhelmingly obvious. For instance, a relationship with God requires free response and trust, which might be undermined by overwhelming evidence. As philosopher Blaise Pascal noted, God provides enough evidence for those willing to believe, but not so much as to compel those unwilling.\n\n2. **Evidence Is Sufficient**: There is actually substantial evidence for God's existence, including cosmological arguments from the universe's beginning, fine-tuning arguments from the precise calibration of physical constants, moral arguments from the existence of objective values, and historical evidence for the resurrection of Jesus. The issue may not be lack of evidence but the interpretation of evidence.\n\n3. **Divine Revelation**: God has revealed Himself through Scripture, through Christ, and through the internal witness of the Holy Spirit. These provide personal, experiential evidence that complements philosophical and scientific evidence.\n\n4. **Nature of Faith**: Biblical faith is not believing without evidence but trusting based on evidence. Hebrews 11:1 describes faith as 'the assurance of things hoped for, the conviction of things not seen'—indicating confidence based on evidence even of unseen realities.\n\nMany renowned philosophers and scientists throughout history have found the evidence for God compelling. The question might not be 'Why isn't there more evidence?' but 'Why do we interpret the existing evidence differently?'"
-    },
-    suffering: {
-      objection: "How can a good God allow so much suffering in the world?",
-      response: "The problem of suffering is perhaps the most significant emotional and intellectual obstacle to belief in God. Here's a thoughtful response:\n\n1. **Free Will Defense**: Much suffering results from human free choices. For God to create beings with genuine freedom means allowing them the possibility of making harmful choices. Without this freedom, human love and relationship with God would be meaningless.\n\n2. **Character Development**: Suffering often produces character growth, compassion, and moral development that couldn't occur otherwise. As Romans 5:3-5 suggests, suffering produces perseverance, character, and hope.\n\n3. **Limited Perspective**: Our temporal, finite perspective means we cannot see the full picture of how suffering might be redeemed in the broader context of God's purposes. Just as a child doesn't understand why a parent permits painful medical treatment, we may not grasp God's ultimate purposes.\n\n4. **The Cross of Christ**: Christianity uniquely offers a God who doesn't remain distant from suffering but enters into it. In Christ, God Himself experiences human suffering, demonstrating both His love and His understanding of our pain.\n\n5. **Ultimate Redemption**: Christianity promises that suffering is not the final word. Revelation 21:4 describes a future where God 'will wipe every tear from their eyes. There will be no more death or mourning or crying or pain.'\n\nWhile these responses don't eliminate the emotional weight of suffering, they provide a framework for understanding how suffering might be compatible with God's goodness and power."
-    },
-    reliability: {
-      objection: "Hasn't the Bible been corrupted over time through countless translations?",
-      response: "This common objection misunderstands both the transmission process of biblical texts and the nature of translation. Here's why the Bible's reliability stands up to scrutiny:\n\n1. **Manuscript Evidence**: We have over 5,800 Greek New Testament manuscripts, with the earliest fragments dating to within decades of the original writings. This vastly exceeds any other ancient document (Homer's Iliad has about 650 manuscripts with a 500-year gap to the earliest copy). The Old Testament's careful transmission is confirmed by the remarkable consistency between the Dead Sea Scrolls and medieval manuscripts.\n\n2. **Translation Process**: Modern translations aren't made as a chain (English from Latin from Greek from Hebrew) but directly from the best available ancient manuscripts. Scholars consult multiple manuscript families to establish the most accurate original text.\n\n3. **Textual Variations**: While textual variants exist among manuscripts, over 99% are minor spelling differences or word order variations that don't affect meaning. No major Christian doctrine depends on disputed passages.\n\n4. **Archaeological Confirmation**: Archaeological discoveries consistently confirm biblical historical details, including previously disputed references to people, places, and customs.\n\n5. **Scientific Scrutiny**: Biblical texts have been subjected to more rigorous scholarly analysis than any other ancient documents, yet their historical reliability has repeatedly been demonstrated.\n\nWhen people claim the Bible has been 'corrupted through translations,' they're often repeating a misconception rather than engaging with the substantial evidence for the Bible's reliable transmission and accurate translation."
-    },
-    resurrection: {
-      objection: "Isn't it more reasonable to believe the disciples hallucinated or made up the resurrection?",
-      response: "While naturalistic explanations for resurrection accounts might initially seem more plausible, they face significant historical and logical problems:\n\n1. **Group Hallucinations**: Psychologists recognize that hallucinations are individual experiences, not group phenomena. Yet 1 Corinthians 15 (written within 25 years of events) records appearances to groups, including 500 at once.\n\n2. **Empty Tomb**: Both hallucination and conspiracy theories fail to explain the empty tomb, which even hostile witnesses didn't deny. If authorities could have produced Jesus' body, Christianity would have been immediately disproven.\n\n3. **Transformed Disciples**: The disciples transformed from fearful deserters to bold proclaimers willing to die for their testimony. This dramatic change is difficult to explain if they knew their claims were false or based on subjective experiences.\n\n4. **Enemy Conversions**: Prominent skeptics like James (Jesus' brother) and Paul (persecutor of the church) became believers after claiming to see the risen Jesus. These conversions are difficult to attribute to wishful thinking or group pressure.\n\n5. **Cultural Context**: In Jewish thought, resurrection meant bodily resurrection, not spiritual survival. The disciples proclaimed precisely what they would not have imagined or expected.\n\n6. **Historical Emergence**: The church emerged in Jerusalem, precisely where verification or falsification of resurrection claims would have been easiest. This would be an unlikely choice for promoting a fabrication.\n\nWhen examining the total evidence, the resurrection stands as the most coherent explanation for the historical data, despite initial philosophical objections to miracles."
-    },
-    science: {
-      objection: "Science has disproven God; we don't need that hypothesis anymore.",
-      response: "The claim that science has disproven God reflects a fundamental misunderstanding of both science and theology:\n\n1. **Methodological Limitations**: Science, by definition, investigates natural causes through empirical observation. It's methodologically limited to natural explanations, making it incapable of either proving or disproving supernatural realities. As philosopher Alvin Plantinga notes, 'Science doesn't say there is no God, rather scientific *naturalism* says there is no God.'\n\n2. **Compatible Domains**: Science addresses questions of mechanism ('how'), while theology addresses questions of meaning and purpose ('why'). Many leading scientists—from Francis Collins (Human Genome Project) to John Polkinghorne (theoretical physics)—find science and faith deeply compatible.\n\n3. **Scientific Discoveries Supporting Theism**: Several scientific developments align well with theistic expectations, including:\n   - The universe's beginning from nothing (Big Bang cosmology)\n   - Fine-tuning of physical constants necessary for life\n   - The information-rich nature of DNA\n   - The emergence of consciousness\n\n4. **Historical Harmony**: Modern science emerged primarily from a Judeo-Christian worldview that expected an orderly, intelligible universe created by a rational God. Many foundational scientists (Newton, Faraday, Maxwell, etc.) were devout believers whose faith motivated their scientific pursuits.\n\n5. **Laplace's Context**: The 'God hypothesis' Laplace dismissed (when telling Napoleon he had 'no need of that hypothesis') referred specifically to God as an explanation for planetary perturbations, not God's existence altogether.\n\nRather than science disproving God, many find that deeper scientific understanding reveals a universe whose fundamental character—rationality, intelligibility, mathematical elegance—points toward a mind behind it all."
-    }
-  };
-  
-  const handleQuerySubmit = (e: React.FormEvent) => {
+
+  // Submit handler for real-time apologetics
+  const handleQuerySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     setIsGenerating(true);
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      setIsGenerating(false);
-      
+    setApiResponse(null);
+
+    try {
+      const response = await fetch("/api/apologetics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: query }),
+      });
+      const data = await response.json();
+      setApiResponse(data.answer || "No answer found.");
+
       toast({
         title: "Response generated",
         description: "Apologetic response has been generated based on your query.",
       });
-    }, 1500);
+    } catch (error) {
+      setApiResponse("There was an error generating the response.");
+      toast({
+        title: "Error",
+        description: "Failed to generate apologetic response.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
-  
+
   const handleAddResource = () => {
     toast({
       title: "Resource added",
@@ -149,7 +171,7 @@ export default function Apologetics() {
     });
     setShowAddResourceDialog(false);
   };
-  
+
   return (
     <div className="space-y-6">
       <div>
@@ -158,7 +180,7 @@ export default function Apologetics() {
           Tools and resources for defending the faith in real-time
         </p>
       </div>
-      
+
       {/* Quick actions card */}
       <Card className="bg-slate-50 dark:bg-gray-800/50">
         <CardContent className="p-6">
@@ -178,7 +200,7 @@ export default function Apologetics() {
           </div>
         </CardContent>
       </Card>
-      
+
       {/* Main content with tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid grid-cols-3 md:w-[400px]">
@@ -186,7 +208,7 @@ export default function Apologetics() {
           <TabsTrigger value="resources">Resources</TabsTrigger>
           <TabsTrigger value="topics">Topics</TabsTrigger>
         </TabsList>
-        
+
         {/* Real-Time Defense Tab */}
         <TabsContent value="realtime" className="space-y-4">
           <Card>
@@ -211,18 +233,16 @@ export default function Apologetics() {
                     </SelectContent>
                   </Select>
                 </div>
-                
                 <div className="space-y-2">
                   <Label htmlFor="query">Objection or Question</Label>
-                  <Textarea 
-                    id="query" 
-                    placeholder="Enter the objection or question you need to respond to..." 
+                  <Textarea
+                    id="query"
+                    placeholder="Enter the objection or question you need to respond to..."
                     className="min-h-[100px]"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                   />
                 </div>
-                
                 <div className="space-y-2">
                   <Label htmlFor="audience">Audience</Label>
                   <Select defaultValue="layperson">
@@ -238,7 +258,6 @@ export default function Apologetics() {
                     </SelectContent>
                   </Select>
                 </div>
-                
                 <Button type="submit" className="w-full" disabled={isGenerating}>
                   {isGenerating ? (
                     <>
@@ -260,52 +279,23 @@ export default function Apologetics() {
               </form>
             </CardContent>
           </Card>
-          
-          {/* Sample Response Display */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Sample Response</CardTitle>
-              <CardDescription>Here's how to respond to the objection</CardDescription>
-            </CardHeader>
-            <CardContent className="prose dark:prose-invert max-w-none">
-              <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg mb-4">
-                <h3 className="text-lg font-medium text-slate-800 dark:text-white mb-1">Objection:</h3>
-                <p className="text-slate-600 dark:text-slate-300">
-                  {realTimeResponses.science.objection}
-                </p>
-              </div>
-              
-              <h3 className="text-lg font-medium text-slate-800 dark:text-white mb-2">Response:</h3>
-              <div className="whitespace-pre-line text-slate-600 dark:text-slate-300">
-                {realTimeResponses.science.response}
-              </div>
-              
-              <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
-                <h4 className="font-medium text-slate-800 dark:text-white mb-2">Key Resources for Further Study:</h4>
-                <ul className="text-slate-600 dark:text-slate-300">
-                  <li>"God's Undertaker: Has Science Buried God?" by John Lennox</li>
-                  <li>"The Language of God" by Francis Collins</li>
-                  <li>"Where the Conflict Really Lies" by Alvin Plantinga</li>
-                </ul>
-              </div>
-            </CardContent>
-            <CardFooter className="flex gap-2">
-              <Button variant="outline" className="flex-1">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                Save Response
-              </Button>
-              <Button variant="outline" className="flex-1">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-                </svg>
-                Copy to Clipboard
-              </Button>
-            </CardFooter>
-          </Card>
+
+          {/* Dynamic API Response */}
+          {apiResponse && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Response</CardTitle>
+                <CardDescription>Here's how to respond to the objection</CardDescription>
+              </CardHeader>
+              <CardContent className="prose dark:prose-invert max-w-none">
+                <div className="whitespace-pre-line text-slate-600 dark:text-slate-300">
+                  {apiResponse}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
-        
+
         {/* Resources Tab */}
         <TabsContent value="resources" className="space-y-4">
           <div className="flex justify-between items-center">
@@ -314,10 +304,8 @@ export default function Apologetics() {
               <Input placeholder="Search resources..." />
             </div>
           </div>
-          
-          {/* Resources List */}
           <div className="space-y-4">
-            {resources.map(resource => (
+            {resources.map((resource) => (
               <Card key={resource.id}>
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
@@ -366,7 +354,7 @@ export default function Apologetics() {
             ))}
           </div>
         </TabsContent>
-        
+
         {/* Topics Tab */}
         <TabsContent value="topics" className="space-y-4">
           <div className="flex justify-between items-center">
@@ -375,10 +363,8 @@ export default function Apologetics() {
               <Input placeholder="Search topics..." />
             </div>
           </div>
-          
-          {/* Topics Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {categories.map(category => (
+            {categories.map((category) => (
               <Card key={category.id} className="relative overflow-hidden">
                 <CardContent className="p-6">
                   <h4 className="font-medium text-slate-800 dark:text-white">{category.name}</h4>
@@ -392,7 +378,6 @@ export default function Apologetics() {
               </Card>
             ))}
           </div>
-          
           {/* Featured Topic */}
           <Card className="border-primary-100 dark:border-primary-800">
             <CardHeader>
@@ -404,7 +389,6 @@ export default function Apologetics() {
                 <p className="text-slate-600 dark:text-slate-300">
                   The problem of evil and suffering is perhaps the most emotionally and intellectually challenging objection to the Christian faith. It asks: If God is all-good (omnibenevolent), all-knowing (omniscient), and all-powerful (omnipotent), how can evil and suffering exist?
                 </p>
-                
                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
                   <h4 className="font-medium text-slate-800 dark:text-white mb-2">Key Approaches:</h4>
                   <ul className="list-disc pl-5 text-slate-600 dark:text-slate-300 space-y-1">
@@ -414,7 +398,6 @@ export default function Apologetics() {
                     <li><span className="font-medium">The Cross</span>: Christianity uniquely offers a God who enters into and experiences suffering with us</li>
                   </ul>
                 </div>
-                
                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
                   <h4 className="font-medium text-slate-800 dark:text-white mb-2">Key Scriptures:</h4>
                   <div className="flex flex-wrap gap-2">
@@ -425,7 +408,6 @@ export default function Apologetics() {
                     <span className="px-2.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full text-xs font-medium">Job 38-42</span>
                   </div>
                 </div>
-                
                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
                   <h4 className="font-medium text-slate-800 dark:text-white mb-2">Key Resources:</h4>
                   <ul className="list-disc pl-5 text-slate-600 dark:text-slate-300 space-y-1">
@@ -443,7 +425,7 @@ export default function Apologetics() {
           </Card>
         </TabsContent>
       </Tabs>
-      
+
       {/* Add Resource Dialog */}
       <Dialog open={showAddResourceDialog} onOpenChange={setShowAddResourceDialog}>
         <DialogContent className="sm:max-w-[425px]">
