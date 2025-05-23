@@ -520,5 +520,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+app.get("/api/debug-apologetics", async (req, res) => {
+  const question = req.query.question as string;
+  try {
+    const results = await TheologyAggregator.getAggregatedAnswer(question || "John 3:16");
+    res.json({ results });
+  } catch (err) {
+    res.status(500).json({ error: "Aggregator failed", details: (err as Error).message });
+  }
+});
+         
   return httpServer;
 }
