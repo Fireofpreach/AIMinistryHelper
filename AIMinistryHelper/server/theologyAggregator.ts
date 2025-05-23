@@ -1,9 +1,11 @@
 import fetch from "node-fetch";
+import { Configuration, OpenAIApi } from "openai";
 
-/**
- * TheologyAggregator provides methods to fetch biblical and theological information
- * from various free online resources.
- */
+// Setup OpenAI client with your API key from environment
+const openai = new OpenAIApi(
+  new Configuration({ apiKey: process.env.OPENAI_API_KEY })
+);
+
 export class TheologyAggregator {
   /**
    * Fetches a Bible verse using Bible-API.
@@ -26,38 +28,63 @@ export class TheologyAggregator {
    * Fetches topical Bible results from OpenBible.info.
    * @param topic - Topic or question, e.g. "forgiveness"
    */
-  static async getTopicalBibleAnswer(topic: string): Promise<string> {
+  static getTopicalBibleAnswer(topic: string): string {
+    return `Topical Bible results: https://www.openbible.info/topics/${encodeURIComponent(topic)}`;
+  }
+
+  /**
+   * STEP Bible resource link.
+   * @param query - Subject or passage to lookup
+   */
+  static getStepBibleResource(query: string): string {
+    return `STEP Bible search: https://www.stepbible.org/?q=search&q=${encodeURIComponent(query)}`;
+  }
+
+  /**
+   * Calls OpenAI to generate an apologetics answer to the question.
+   */
+  static async getOpenAIApologeticsAnswer(question: string): Promise<string> {
     try {
-      return `Topical Bible results for "${topic}": https://www.openbible.info/topics/${encodeURIComponent(topic)}`;
+      const systemPrompt = 
+        "You are an apologetics assistant. Given a question or objection to Christianity, write a clear, biblically grounded, and persuasive apologetics answer suitable for a thoughtful audience. Use Scripture and reasoning where appropriate, and respond in several paragraphs if needed.";
+
+      const completion = await openai.createChatCompletion({
+        model: "gpt-4", // Or "gpt-3.5-turbo" if you want a cheaper/faster model
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: question }
+        ],
+        max_tokens: 600,
+        temperature: 0.7,
+      });
+
+      return completion.data.choices[0].message?.content || "No answer generated.";
     } catch (error) {
-      return "OpenBible.info: Error fetching topical results.";
+      return "OpenAI: Error generating apologetics answer.";
     }
   }
 
   /**
-   * Placeholder for STEP Bible API integration.
-   * @param query - Subject or passage to lookup
-   */
-  static async getStepBibleResource(query: string): Promise<string> {
-    return `Search STEP Bible for "${query}": https://www.stepbible.org/?q=search&q=${encodeURIComponent(query)}`;
-  }
-
-  /**
-   * Aggregates answers from all sources for the given query.
+   * Aggregates a full apologetics answer (AI + links).
    * @param query - User's question or Bible reference
    */
   static async getAggregatedAnswer(query: string): Promise<string[]> {
-    // Try to detect if the query is a Bible reference (simple regex for book + chapter:verse)
     const bibleRefPattern = /^[A-Za-z ]+\d+:\d+(-\d+)?$/;
     const isBibleRef = bibleRefPattern.test(query.trim());
 
     const results: string[] = [];
+
+    // 1. Main apologetics answer (AI)
+    results.push(await this.getOpenAIApologeticsAnswer(query));
+
+    // 2. Optionally add Bible verse if the query looks like a reference
     if (isBibleRef) {
       results.push(await this.getBibleVerse(query));
     }
-    // Always add topical and STEP Bible resources
-    results.push(await this.getTopicalBibleAnswer(query));
-    results.push(await this.getStepBibleResource(query));
+
+    // 3. Add topical and STEP Bible resource links
+    results.push(this.getTopicalBibleAnswer(query));
+    results.push(this.getStepBibleResource(query));
     return results;
   }
 }
