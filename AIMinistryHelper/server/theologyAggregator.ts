@@ -18,6 +18,8 @@ export class TheologyAggregator {
       }
       return `Bible-API: Verse not found for "${reference}".`;
     } catch (error) {
+      // Log error for debugging
+      console.error("Bible-API error:", error);
       return "Bible-API: Error fetching verse.";
     }
   }
@@ -46,8 +48,9 @@ export class TheologyAggregator {
       const systemPrompt = 
         "You are an apologetics assistant. Given a question or objection to Christianity, write a clear, biblically grounded, and persuasive apologetics answer suitable for a thoughtful audience. Use Scripture and reasoning where appropriate, and respond in several paragraphs if needed.";
 
+      // Try gpt-3.5-turbo first, as not all keys have gpt-4 access
       const completion = await openai.chat.completions.create({
-        model: "gpt-4", // Or "gpt-3.5-turbo" if you want a cheaper/faster model
+        model: "gpt-3.5-turbo",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: question }
@@ -57,7 +60,16 @@ export class TheologyAggregator {
       });
 
       return completion.choices[0].message.content || "No answer generated.";
-    } catch (error) {
+    } catch (error: any) {
+      // Log error for debugging
+      if (error.response) {
+        // Attempt to log OpenAI API error details
+        error.response.text().then((errText: string) => {
+          console.error("OpenAI API error:", errText);
+        });
+      } else {
+        console.error("OpenAI general error:", error);
+      }
       return "OpenAI: Error generating apologetics answer.";
     }
   }
