@@ -1,10 +1,8 @@
 import fetch from "node-fetch";
-import { Configuration, OpenAIApi } from "openai";
+import OpenAI from "openai";
 
 // Setup OpenAI client with your API key from environment
-const openai = new OpenAIApi(
-  new Configuration({ apiKey: process.env.OPENAI_API_KEY })
-);
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export class TheologyAggregator {
   /**
@@ -48,7 +46,7 @@ export class TheologyAggregator {
       const systemPrompt = 
         "You are an apologetics assistant. Given a question or objection to Christianity, write a clear, biblically grounded, and persuasive apologetics answer suitable for a thoughtful audience. Use Scripture and reasoning where appropriate, and respond in several paragraphs if needed.";
 
-      const completion = await openai.createChatCompletion({
+      const completion = await openai.chat.completions.create({
         model: "gpt-4", // Or "gpt-3.5-turbo" if you want a cheaper/faster model
         messages: [
           { role: "system", content: systemPrompt },
@@ -58,7 +56,7 @@ export class TheologyAggregator {
         temperature: 0.7,
       });
 
-      return completion.data.choices[0].message?.content || "No answer generated.";
+      return completion.choices[0].message.content || "No answer generated.";
     } catch (error) {
       return "OpenAI: Error generating apologetics answer.";
     }
