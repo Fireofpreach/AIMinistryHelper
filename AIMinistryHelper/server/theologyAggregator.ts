@@ -1,11 +1,6 @@
 import fetch from "node-fetch";
-import OpenAI from "openai";
 
-// Setup OpenRouter client with your API key from environment
-const openai = new OpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY, // Set your OpenRouter key in the environment
-  baseURL: "https://openrouter.ai/api/v1",
-});
+// REMOVE OpenAI and OpenRouter imports and setup
 
 export class TheologyAggregator {
   /**
@@ -44,34 +39,36 @@ export class TheologyAggregator {
   }
 
   /**
-   * Calls OpenRouter to generate an apologetics answer to the question.
+   * Calls Hugging Face Inference API to generate an apologetics answer.
    */
-  static async getOpenAIApologeticsAnswer(question: string): Promise<string> {
+  static async getHuggingFaceApologeticsAnswer(question: string): Promise<string> {
+    const endpoint = "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct";
     try {
-      const systemPrompt =
-        "You are an apologetics assistant. Given a question or objection to Christianity, write a clear, biblically grounded, and persuasive apologetics answer suitable for a thoughtful audience. Use Scripture and reasoning where appropriate, and respond in several paragraphs if needed.";
-
-      // Use a free model from OpenRouter, such as Llama 3
-      const completion = await openai.chat.completions.create({
-        model: "meta-llama/llama-3-8b-instruct",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: question }
-        ],
-        max_tokens: 600,
-        temperature: 0.7,
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          inputs: question,
+          parameters: {
+            max_new_tokens: 600,
+            temperature: 0.7
+          }
+        })
       });
-
-      return completion.choices[0].message.content || "No answer generated.";
-    } catch (error: any) {
-      // Log error for debugging
-      if (error.response) {
-        error.response.text().then((errText: string) => {
-          console.error("OpenRouter API error:", errText);
-        });
-      } else {
-        console.error("OpenRouter general error:", error);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Hugging Face API error:", errorText);
+        return "AI: Error generating apologetics answer.";
       }
+      const data = await response.json();
+      // The response is usually an array with 'generated_text'
+      const answer = data?.[0]?.generated_text || data?.generated_text || "No answer generated.";
+      return answer;
+    } catch (error) {
+      console.error("Hugging Face general error:", error);
       return "AI: Error generating apologetics answer.";
     }
   }
@@ -87,7 +84,7 @@ export class TheologyAggregator {
     const results: string[] = [];
 
     // 1. Main apologetics answer (AI)
-    results.push(await this.getOpenAIApologeticsAnswer(query));
+    results.push(await this.getHuggingFaceApologeticsAnswer(query));
 
     // 2. Optionally add Bible verse if the query looks like a reference
     if (isBibleRef) {
