@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 
-// REMOVE OpenAI and OpenRouter imports and setup
+// REMOVED OpenAI and OpenRouter imports and setup
 
 export class TheologyAggregator {
   /**
@@ -47,7 +47,7 @@ export class TheologyAggregator {
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
+          "Authorization": `Bearer ${process.env.HUGGINGFACEHUB_API_TOKEN}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
