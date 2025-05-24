@@ -1,8 +1,11 @@
 import fetch from "node-fetch";
 import OpenAI from "openai";
 
-// Setup OpenAI client with your API key from environment
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Setup OpenRouter client with your API key from environment
+const openai = new OpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY, // Set your OpenRouter key in the environment
+  baseURL: "https://openrouter.ai/api/v1",
+});
 
 export class TheologyAggregator {
   /**
@@ -41,16 +44,16 @@ export class TheologyAggregator {
   }
 
   /**
-   * Calls OpenAI to generate an apologetics answer to the question.
+   * Calls OpenRouter to generate an apologetics answer to the question.
    */
   static async getOpenAIApologeticsAnswer(question: string): Promise<string> {
     try {
-      const systemPrompt = 
+      const systemPrompt =
         "You are an apologetics assistant. Given a question or objection to Christianity, write a clear, biblically grounded, and persuasive apologetics answer suitable for a thoughtful audience. Use Scripture and reasoning where appropriate, and respond in several paragraphs if needed.";
 
-      // Try gpt-3.5-turbo first, as not all keys have gpt-4 access
+      // Use a free model from OpenRouter, such as Llama 3
       const completion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "meta-llama/llama-3-8b-instruct",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: question }
@@ -63,14 +66,13 @@ export class TheologyAggregator {
     } catch (error: any) {
       // Log error for debugging
       if (error.response) {
-        // Attempt to log OpenAI API error details
         error.response.text().then((errText: string) => {
-          console.error("OpenAI API error:", errText);
+          console.error("OpenRouter API error:", errText);
         });
       } else {
-        console.error("OpenAI general error:", error);
+        console.error("OpenRouter general error:", error);
       }
-      return "OpenAI: Error generating apologetics answer.";
+      return "AI: Error generating apologetics answer.";
     }
   }
 
